@@ -1,6 +1,7 @@
 
 #include "Window.hpp"
 #include <SDL2/SDL.h>
+#include <SDL_render.h>
 #include <iostream>
 
 
@@ -36,10 +37,15 @@ bool Window::create_window(std::string title, Vec2 size) {
 }
 
 void Window::destroy_window() {
+
+	if (renderer != NULL) {
+		SDL_DestroyRenderer(renderer);
+		renderer = NULL;
+	}
+
 	if (window != NULL) {
 		SDL_DestroyWindow(window);
 		window = NULL;
-		renderer = NULL;
 	}
 }
 
