@@ -5,8 +5,51 @@
 #include <iostream>
 
 
+bool Window::initialized = false;
+
+
+
+bool Window::init() {
+
+	if (is_initialized()) {
+		std::cerr << "E: SDL2 is already initialized." << std::endl;
+		return false;
+	}
+
+	if (SDL_Init(SDL_INIT_VIDEO)) {
+		std::cerr << "E: Failed to initialize SDL2: "  << SDL_GetError() << std::endl;
+		return false;
+	}
+
+	initialized = true;
+	return true;
+
+}
+
+void Window::quit() {
+
+	if (!is_initialized()) {
+		std::cerr << "E: Could not quit SDL2, it is not initialized." << std::endl;
+	}
+
+	SDL_Quit();
+
+	initialized = false;
+
+}
+
+bool Window::is_initialized() {
+	return initialized;
+}
+
+
 
 bool Window::create_window(std::string title, Vec2 size) {
+
+	if (!is_initialized()) {
+		std::cerr << "E: SDL2 must be initialized before a Window can be created." << std::endl;
+		return false;
+	}
 
 	window = SDL_CreateWindow(title.c_str(),
 			SDL_WINDOWPOS_UNDEFINED,

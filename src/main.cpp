@@ -7,15 +7,13 @@
 
 int main(int argc, char* argv[]) {
 
-	if (SDL_Init(SDL_INIT_VIDEO)) {
-		std::cerr << "E: Failed to initialize SDL2: "  << SDL_GetError() << std::endl;
-		return 1;
-	}
+	Window::init();
 
 	Game game;
-
 	game.launch();
 
-	SDL_Quit();
+	Window::quit();
+
+	return 0;
 
 }
