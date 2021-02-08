@@ -17,6 +17,7 @@ find_package(SDL2_ttf REQUIRED)
 
 
 add_executable(blocker
+	src/Game.cpp
 	src/Input.cpp
 	src/main.cpp
 	src/Window.cpp
