@@ -1,7 +1,8 @@
 
 #include "Game.hpp"
 #include "GameState.hpp"
-#include <SDL_render.h>
+#include "Player.hpp"
+#include <SDL2/SDL.h>
 
 
 
@@ -26,8 +27,30 @@ GameState Game::get_game_state() {
 
 bool Game::set_game_state(GameState state) {
 
+	switch (this->state) {
+	case PLAYING:
+		stop_playing();
+		break;
+	}
+
+	switch (state) {
+	case PLAYING:
+		start_playing();
+		break;
+	}
+
 	this->state = state;
 
+}
+
+
+
+Input* Game::get_input() {
+	return &input;
+}
+
+Vec2 Game::get_screen_size() {
+	return window.get_size();
 }
 
 
@@ -41,6 +64,8 @@ bool Game::setup() {
 
 	input.add_key(SDLK_q);
 
+	player = new Player;
+
 	return true;
 
 }
@@ -49,10 +74,9 @@ bool Game::run() {
 
 	set_game_state(PLAYING);
 
-
 	while (get_game_state() != QUIT) {
 
-		get_input();
+		poll_input();
 		update();
 		render();
 
@@ -67,11 +91,13 @@ void Game::clean_up() {
 	input.remove_key(SDLK_q);
 	window.destroy_window();
 
+	delete player;
+
 }
 
 
 
-void Game::get_input() {
+void Game::poll_input() {
 	
 	SDL_Event event;
 
@@ -93,9 +119,18 @@ void Game::get_input() {
 
 void Game::update() {
 
+	Uint32 now = SDL_GetTicks();
+	if (now < last_update + 50) {
+		return;
+	}
+
+	last_update = now;
+
 	if (input.get_key(SDLK_q)) {
 		set_game_state(QUIT);
 	}
+
+	player->update(this);
 
 }
 
@@ -103,9 +138,24 @@ void Game::render() {
 
 	SDL_Renderer* renderer = window.get_renderer();
 
-	SDL_SetRenderDrawColor(renderer, 0, 100, 50, 255);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
+
+	player->render(renderer, 0.0);
+
 	SDL_RenderPresent(renderer);
 
 }
 
+
+
+void Game::stop_playing() {
+	if(player->is_alive()) {
+		player->kill(this);
+	}
+}
+
+void Game::start_playing() {
+	player->spawn(this);
+	player->set_max_velocity(8);
+}

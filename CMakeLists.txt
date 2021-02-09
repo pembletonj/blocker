@@ -17,11 +17,13 @@ find_package(SDL2_ttf REQUIRED)
 
 
 add_executable(blocker
+	src/Block.cpp
 	src/Game.cpp
 	src/Input.cpp
 	src/main.cpp
-	src/Window.cpp
+	src/Player.cpp
 	src/Vec2.cpp
+	src/Window.cpp
 )
 
 
