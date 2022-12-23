@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include <SDL2/SDL.h>
 
 #include "key_states.hpp"
@@ -8,6 +9,8 @@ const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
 int main(int argc, char **argv) {
+
+    srand(time(NULL));
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -52,6 +55,10 @@ int main(int argc, char **argv) {
     data.player = new Player();
     data.player->init(&data);
 
+    Enemy *enemy = new Enemy();
+    enemy->init(&data);
+    data.enemies.insert(enemy);
+
     while (running) {
 
         time = SDL_GetTicks64();
@@ -78,6 +85,9 @@ int main(int argc, char **argv) {
         if (update_dt > 50) {
             prev_update_time = time;
             data.player->update(update_dt, &data);
+            for (auto it = data.enemies.begin(); it != data.enemies.end(); it++) {
+                (*it)->update(update_dt, &data);
+            }
         }
 
         // Render
@@ -88,6 +98,9 @@ int main(int argc, char **argv) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             data.player->render(time - prev_update_time, renderer, &data);
+            for (auto it = data.enemies.begin(); it != data.enemies.end(); it++) {
+                (*it)->render(time - prev_update_time, renderer, &data);
+            }
             SDL_RenderPresent(renderer);
         }
 
@@ -102,6 +115,10 @@ int main(int argc, char **argv) {
     }
 
 
+
+    for (auto it = data.enemies.begin(); it != data.enemies.end(); it++) {
+        delete *it;
+    }
 
     data.player->finish(&data);
     delete data.player;
