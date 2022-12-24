@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
             prev_fps_time = time;
             fps = frames;
             frames = 0;
-            std::cout << fps << std::endl;
+            std::cout << "FPS: " << fps << std::endl;
         }
     }
 

@@ -44,6 +44,19 @@ bool Player::update(int dt, GameData *data) {
     dx = vx * speed;
     dy = vy * speed;
 
+    // Hit any enemies?
+
+    colour = colour3(255, 255, 255);
+    SDL_Rect playerRect = get_rect();
+
+    for (auto it = data->enemies.begin(); it != data->enemies.end(); it++) {
+        SDL_Rect enemyRect = (*it)->get_rect();
+        if (SDL_HasIntersection(&playerRect, &enemyRect)) {
+            colour = colour3(255, 255, 0);
+            break;
+        }
+    }
+
     update_block(dt, data);
 
     return true;

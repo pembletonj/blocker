@@ -17,37 +17,6 @@ bool Block::update(int dt, GameData *data) {
     return true;
 }
 
-void Block::init_block(GameData *data) {
-    trail.clear();
-    trail_max_len = 10;
-}
-
-void Block::finish_block(GameData *data) {
-    trail.clear();
-}
-
-void Block::update_block(int dt, GameData *data) {
-
-    // Keep in the bounds
-
-    x = clamp(x, 0, data->screen_width - size);
-    y = clamp(y, 0, data->screen_height - size);
-
-    // Trail
-
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.h = size;
-    rect.w = size;
-
-    trail.push_front(rect);
-    if (trail.size() > trail_max_len) {
-        trail.pop_back();
-    }
-
-}
-
 void Block::render(int dt, SDL_Renderer *renderer, GameData *data) {
 
     // Block
@@ -69,4 +38,40 @@ void Block::render(int dt, SDL_Renderer *renderer, GameData *data) {
         SDL_RenderFillRect(renderer, &(*it));
         alpha -= da;
     }
+}
+
+SDL_Rect Block::get_rect() {
+    return SDL_Rect {
+        .x = x,
+        .y = y,
+        .w = size,
+        .h = size
+    };
+}
+
+void Block::init_block(GameData *data) {
+    trail.clear();
+    trail_max_len = 10;
+}
+
+void Block::finish_block(GameData *data) {
+    trail.clear();
+}
+
+void Block::update_block(int dt, GameData *data) {
+
+    // Keep in the bounds
+
+    x = clamp(x, 0, data->screen_width - size);
+    y = clamp(y, 0, data->screen_height - size);
+
+    // Trail
+
+    SDL_Rect rect = get_rect();
+
+    trail.push_front(rect);
+    if (trail.size() > trail_max_len) {
+        trail.pop_back();
+    }
+
 }
