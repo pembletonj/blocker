@@ -47,17 +47,25 @@ bool Player::update(int dt, GameData *data) {
     // Hit any enemies?
 
     colour = colour3(255, 255, 255);
-    SDL_Rect playerRect = get_rect();
+    SDL_Rect player_rect = get_rect();
 
     for (auto it = data->enemies.begin(); it != data->enemies.end(); it++) {
-        SDL_Rect enemyRect = (*it)->get_rect();
-        if (SDL_HasIntersection(&playerRect, &enemyRect)) {
+        SDL_Rect enemy_rect = (*it)->get_rect();
+        if (SDL_HasIntersection(&player_rect, &enemy_rect)) {
             colour = colour3(255, 255, 0);
-            break;
+            health = clamp(health - 1, 0, max_health);
         }
     }
 
     update_block(dt, data);
 
-    return true;
+    return health > 0;
+}
+
+int Player::get_health() {
+    return health;
+}
+
+int Player::get_max_health() {
+    return max_health;
 }

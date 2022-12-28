@@ -50,10 +50,15 @@ int main(int argc, char **argv) {
     int fps = 0;
 
     GameData data;
+
     data.screen_width = SCREEN_WIDTH;
     data.screen_height = SCREEN_HEIGHT;
+
     data.player = new Player();
     data.player->init(&data);
+
+    data.hud = new Hud();
+    data.hud->init(&data);
 
     Enemy *enemy = new Enemy();
     enemy->init(&data);
@@ -84,9 +89,19 @@ int main(int argc, char **argv) {
 
         if (update_dt > 50) {
             prev_update_time = time;
-            data.player->update(update_dt, &data);
-            for (auto it = data.enemies.begin(); it != data.enemies.end(); it++) {
-                (*it)->update(update_dt, &data);
+            running = data.player->update(update_dt, &data) && running;
+            data.hud->update(update_dt, &data);
+
+            auto it = data.enemies.begin();
+            while (it != data.enemies.end()) {
+                 if ((*it)->update(update_dt, &data)) {
+                    it++;
+                 }
+                 else {
+                    (*it)->finish(&data);
+                    delete *it;
+                    data.enemies.erase(it);
+                 }
             }
         }
 
@@ -98,6 +113,7 @@ int main(int argc, char **argv) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             data.player->render(time - prev_update_time, renderer, &data);
+            data.hud->render(time - prev_update_time, renderer, &data);
             for (auto it = data.enemies.begin(); it != data.enemies.end(); it++) {
                 (*it)->render(time - prev_update_time, renderer, &data);
             }
@@ -119,6 +135,9 @@ int main(int argc, char **argv) {
     for (auto it = data.enemies.begin(); it != data.enemies.end(); it++) {
         delete *it;
     }
+
+    data.hud->finish(&data);
+    delete data.hud;
 
     data.player->finish(&data);
     delete data.player;
