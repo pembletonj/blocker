@@ -33,3 +33,7 @@ double random_double(double min, double max) {
     double fraction = (double) rand() / RAND_MAX;
     return min + (fraction * (max - min));
 }
+
+bool random_bool(double chance) {
+    return random_double(0.0, 1.0) <= chance;
+}

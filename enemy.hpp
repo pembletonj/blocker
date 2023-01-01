@@ -16,4 +16,7 @@ private:
 
     double vx;
     double vy;
+
+    Uint64 max_age;
+    Uint64 age;
 };

@@ -6,6 +6,8 @@
 
 void Enemy::init(GameData *data) {
     size = 20;
+    max_age = 60000;
+    age = 0;
 
     int edge_pos = random_int(0, (2 * data->screen_height) + (2 * data->screen_width) - 1);
 
@@ -37,7 +39,8 @@ bool Enemy::update(int dt, GameData *data) {
 
     update_block(dt, data);
 
-    return true;
+    age += dt;
+    return age < max_age;
 }
 
 int Enemy::x_from_edge_pos(int edge, int w, int h) {

@@ -4,6 +4,7 @@
 
 #include "key_states.hpp"
 #include "game_data.hpp"
+#include "spawner.hpp"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
@@ -44,6 +45,7 @@ int main(int argc, char **argv) {
     Uint64 time = 0;
     Uint64 prev_render_time = 0;
     Uint64 prev_update_time = 0;
+    Uint64 prev_spawn_chance_time = 0;
 
     Uint32 prev_fps_time = 0;
     int frames = 0;
@@ -54,21 +56,24 @@ int main(int argc, char **argv) {
     data.screen_width = SCREEN_WIDTH;
     data.screen_height = SCREEN_HEIGHT;
 
-    data.player = new Player();
+    std::unique_ptr<Player> player(new Player());
+    data.player = std::move(player);
     data.player->init(&data);
 
-    data.hud = new Hud();
+    std::unique_ptr<Hud> hud(new Hud());
+    data.hud = std::move(hud);
     data.hud->init(&data);
 
-    Enemy *enemy = new Enemy();
+    /*Enemy *enemy = new Enemy();
     enemy->init(&data);
-    data.enemies.insert(enemy);
+    data.enemies.insert(enemy);*/
 
     while (running) {
 
         time = SDL_GetTicks64();
         int render_dt = time - prev_render_time;
         int update_dt = time - prev_update_time;
+        int spawn_chance_dt = time - prev_spawn_chance_time;
         int fps_dt = time - prev_fps_time;
 
         while (SDL_PollEvent(&e)) {
@@ -86,7 +91,6 @@ int main(int argc, char **argv) {
         }
 
         // Update
-
         if (update_dt > 50) {
             prev_update_time = time;
             running = data.player->update(update_dt, &data) && running;
@@ -99,14 +103,20 @@ int main(int argc, char **argv) {
                  }
                  else {
                     (*it)->finish(&data);
-                    delete *it;
-                    data.enemies.erase(it);
+                    //delete *it;
+                    it = data.enemies.erase(it);
+                    //break;
                  }
             }
         }
 
-        // Render
+        // Spawn enemies
+        if (spawn_chance_dt > 1000) {
+            prev_spawn_chance_time = time;
+            try_spawn(0.2, &data);
+        }
 
+        // Render
         if (render_dt > 16) {
             prev_render_time = time;
             frames++;
@@ -137,10 +147,10 @@ int main(int argc, char **argv) {
     }
 
     data.hud->finish(&data);
-    delete data.hud;
+    //delete data.hud;
 
     data.player->finish(&data);
-    delete data.player;
+    //delete data.player;
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

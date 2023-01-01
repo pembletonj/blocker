@@ -4,14 +4,17 @@ LDFLAGS = -lSDL2
 
 all : blocker
 
-blocker : main.o key_states.o entity.o block.o player.o hud.o enemy.o game_utils.o
-	$(CXX) main.o key_states.o entity.o block.o player.o hud.o enemy.o game_utils.o $(CXXFLAGS) $(LDFLAGS) -o blocker
+blocker : main.o key_states.o spawner.o entity.o block.o player.o hud.o enemy.o game_utils.o
+	$(CXX) main.o key_states.o spawner.o entity.o block.o player.o hud.o enemy.o game_utils.o $(CXXFLAGS) $(LDFLAGS) -o blocker
 
 main.o : main.cpp
 	$(CXX) $(CXXFLAGS) -c main.cpp
 
 key_states.o : key_states.cpp
 	$(CXX) $(CXXFLAGS) -c key_states.cpp
+
+spawner.o : spawner.cpp
+	$(CXX) $(CXXFLAGS) -c spawner.cpp
 
 entity.o : entity.cpp
 	$(CXX) $(CXXFLAGS) -c entity.cpp
